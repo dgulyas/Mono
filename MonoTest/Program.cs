@@ -1,3 +1,3 @@
 ﻿
-using var game = new MonoTest.Game4();
+using var game = new MonoTest.Game5();
 game.Run();
