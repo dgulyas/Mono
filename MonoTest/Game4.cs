@@ -6,34 +6,38 @@ using System;
 
 namespace MonoTest
 {
-    public class Game3 : Game
+    public class Game4 : Game
     {
         readonly GraphicsDeviceManager graphics;
 
-        int[][] sand;
-        int width = 256;
-        int height = 256;
+        int numThings = 300000;
+        int screenSize = 2000;
 
-        public Game3()
+        int[] x;
+        int[] y;
+
+        Random rand = new Random();
+
+
+        public Game4()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            sand = new int[height][];
-            for(int j = 0; j < sand.Length; j++)
+
+            x = new int[numThings];
+            y = new int[numThings];
+            for (int i = 0; i < x.Length; i++)
             {
-                sand[j] = new int[width];
-                for(int i = 0; i < sand[j].Length; i++)
-                {
-                    sand[j][i] = i * j % 255;
-                }
+                x[i] = screenSize / 2;
+                y[i] = screenSize / 2;
             }
         }
 
         protected override void Initialize()
         {
             graphics.IsFullScreen = false;
-            graphics.PreferredBackBufferWidth = width*6+50;
-            graphics.PreferredBackBufferHeight = height*6+50;
+            graphics.PreferredBackBufferWidth = screenSize;
+            graphics.PreferredBackBufferHeight = screenSize;
             graphics.ApplyChanges();
 
             base.Initialize();
@@ -62,20 +66,34 @@ namespace MonoTest
             whiteRectangle.Dispose();
         }
 
+        protected override void Update(GameTime gameTime)
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+
+            for(int i = 0; i < x.Length; i++)
+            {
+                x[i] += rand.Next(-5, 6);
+                y[i] += rand.Next(-4, 5);
+                if (x[i] < 0 || x[i] >= screenSize || y[i] < 0 || y[i] >= screenSize)
+                {
+                    x[i] = screenSize / 2;
+                    y[i] = screenSize / 2;
+                }
+            }
+
+            base.Update(gameTime);
+        }
+
         protected override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
 
-            for (int y = 0; y < sand.Length; y++)
+            for (int i = 0; i < x.Length; i++)
             {
-                for (int x = 0; x < sand[y].Length; x++)
-                {
-                    var v = sand[y][x];
-
-                    spriteBatch.Draw(whiteRectangle, new Rectangle(x * 6 + 25, y * 6 + 25, 4, 4), new Color(v,v,v));
-                }
+                spriteBatch.Draw(whiteRectangle, new Rectangle(x[i], y[i], 2, 2), Color.Black);
             }
 
             spriteBatch.End();
