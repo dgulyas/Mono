@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿//Copied code. Refer to https://github.com/DoogeJ/MonoGame.Primitives2D/blob/master/Primitives2D.cs
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame;
