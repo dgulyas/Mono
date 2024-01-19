@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoTest;
 
 namespace MonoGame
 {
@@ -333,6 +334,10 @@ namespace MonoGame
             DrawLine(spriteBatch, new Vector2(x1, y1), new Vector2(x2, y2), color, thickness);
         }
 
+        public static void DrawLine(this SpriteBatch spriteBatch, Line line, Color color)
+        {
+            DrawLine(spriteBatch, line.P1, line.P2, color);
+        }
 
         /// <summary>
         /// Draws a line from point1 to point2 with an offset
