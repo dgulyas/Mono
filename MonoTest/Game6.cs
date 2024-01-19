@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame;
 
-namespace MonoTest.Game6
+namespace MonoTest
 {
     public class Game6 : Game
     {
@@ -16,7 +16,7 @@ namespace MonoTest.Game6
 
         Line l1;
         Line l2;
-        Vector2 v1;        
+        Vector2 v1;
 
         public Game6()
         {
@@ -32,7 +32,7 @@ namespace MonoTest.Game6
 
             l1 = new Line(new Vector2(5, 5), new Vector2(400, 400));
             l2 = new Line(new Vector2(5, 400), new Vector2(400, 5));
-            v1 = l1.FindIntersection(l2).Value;
+            v1 = Helpers.FindIntersection(l1, l2).Value;
 
             base.Initialize();
         }
@@ -52,7 +52,7 @@ namespace MonoTest.Game6
         protected override void Update(GameTime gameTime)
         {
             l1.P2.X += 4;
-            if(l1.P2.X > 600)
+            if (l1.P2.X > 600)
             {
                 l1.P2.X = 200;
             }
@@ -60,7 +60,7 @@ namespace MonoTest.Game6
             l1.P2.Y = 800 - l1.P2.X;
 
             l2.P1.Y += 1;
-            if(l2.P1.Y > 500)
+            if (l2.P1.Y > 500)
             {
                 l2.P1.Y = 350;
             }
@@ -71,7 +71,7 @@ namespace MonoTest.Game6
                 l2.P2.X = 500;
             }
 
-            v1 = l1.FindIntersection(l2).Value;
+            v1 = Helpers.FindIntersection(l1, l2).Value;
 
             base.Update(gameTime);
         }
