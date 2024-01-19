@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame;
 
 namespace MonoTest
 {
@@ -61,6 +62,7 @@ namespace MonoTest
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
+            spriteBatch.DrawLine(new Line(new Vector2(200, 1), new Vector2(1, 200)), Color.Red);
             spriteBatch.Draw(canvas, new Vector2(0,0), Color.White);
             spriteBatch.End();
         }

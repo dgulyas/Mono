@@ -121,7 +121,7 @@ namespace MonoTest
         /// <param name="start">The beginning of the ray</param>
         /// <param name="end">A point on the ray defining the rays direction</param>
         /// <param name="length">The distance the desired point is from start</param>
-        private static Vector2 GetPointAlongRay(Vector2 start, Vector2 end, float length)
+        public static Vector2 FindPointAlongRay(Vector2 start, Vector2 end, float length)
         {
             //https://math.stackexchange.com/a/2109383
             var distStartEnd = Vector2.Distance(start, end);
