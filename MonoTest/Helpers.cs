@@ -14,7 +14,7 @@ namespace MonoTest
         /// <param name="impactPos">The coordinates on the wall where the point hits it</param>
         /// <param name="endPos">The ending coordinates of the point if it didn't bounce off the wall</param>
         /// <returns>The position fo the point if it had bounced off the wall</returns>
-        public  static Vector2 FindReflectionPoint(Line wall, Vector2 impactPos, Vector2 endPos)
+        public  static Vector2 FindReflCircPoint(Line wall, Vector2 impactPos, Vector2 endPos)
         {
             //This works by taking the intersection between 2 circles.
             //The circle centered on one end of the wall going through the endPos
@@ -76,20 +76,20 @@ namespace MonoTest
 
         }
 
-        public static Vector2? FindIntersection(Line l1, Line l2)
+        public static Vector2? FindIntersection(Line l1, Line l2, bool mustCoverIntersection = true)
         {
             //This implements a set theory approach for finding line segment intersections.
             //https://thirdpartyninjas.com/blog/2008/10/07/line-segment-intersection/
 
             var precision = 0.0000001f;
 
-            var P1 = l1.P1;
-            var P2 = l1.P2;
-            var P3 = l2.P1;
-            var P4 = l2.P2;
+            var L1P1 = l1.P1;
+            var L1P2 = l1.P2;
+            var L2P1 = l2.P1;
+            var L2P2 = l2.P2;
 
             //den = (y4-y3)(x2-x1)-(x4-x3)(y2-y1)
-            var denominator = (P4.Y - P3.Y) * (P2.X - P1.X) - (P4.X - P3.X) * (P2.Y - P1.Y);
+            var denominator = (L2P2.Y - L2P1.Y) * (L1P2.X - L1P1.X) - (L2P2.X - L2P1.X) * (L1P2.Y - L1P1.Y);
 
             if (Math.Abs(denominator) < precision)
             {
@@ -99,17 +99,17 @@ namespace MonoTest
 
             //Ua = (x4-x3)(y1-y3)-(y4-y3)(x1-x3)
             //Ub = (x2-x1)(y1-y3)-(y2-y1)(x1-x3)
-            var Ua = ((P4.X - P3.X) * (P1.Y - P3.Y) - (P4.Y - P3.Y) * (P1.X - P3.X)) / denominator;
-            var Ub = ((P2.X - P1.X) * (P1.Y - P3.Y) - (P2.Y - P1.Y) * (P1.X - P3.X)) / denominator;
+            var Ua = ((L2P2.X - L2P1.X) * (L1P1.Y - L2P1.Y) - (L2P2.Y - L2P1.Y) * (L1P1.X - L2P1.X)) / denominator;
+            var Ub = ((L1P2.X - L1P1.X) * (L1P1.Y - L2P1.Y) - (L1P2.Y - L1P1.Y) * (L1P1.X - L2P1.X)) / denominator;
 
-            if (Ua <= 0 || Ua >= 1 || Ub <= 0 || Ub >= 1)
+            if ((Ua <= 0 || Ua >= 1 || Ub <= 0 || Ub >= 1) && mustCoverIntersection)
             {
                 //Line segments don't cover the intersection point
                 return null;
             }
 
-            var x = P1.X + Ua * (P2.X - P1.X);
-            var y = P1.Y + Ua * (P2.Y - P1.Y);
+            var x = L1P1.X + Ua * (L1P2.X - L1P1.X);
+            var y = L1P1.Y + Ua * (L1P2.Y - L1P1.Y);
 
             return new Vector2(x, y);
         }
@@ -130,6 +130,18 @@ namespace MonoTest
             var y = start.Y - ((length * (start.Y - end.Y)) / distStartEnd);
 
             return new Vector2(x, y);
+        }
+
+        public static Vector2 ReflectPoint(Line wall, Vector2 origPoint)
+        {
+            var wallSlopeX = wall.P1.X - wall.P2.X;
+            var wallSlopeY = wall.P1.Y - wall.P2.Y;
+
+            var secondPoint = origPoint + new Vector2(-1 * wallSlopeY, wallSlopeX);
+
+            var inter = FindIntersection(wall, new Line(origPoint, secondPoint), false);
+            var reflectedPoint = 2 * inter.Value - origPoint;
+            return reflectedPoint;
         }
 
     }

@@ -1,20 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame;
-using System;
 using System.Collections.Generic;
 
 namespace MonoTest
 {
-    //There's a bug in the bouncing code. I'm not sure if it's due to everything being floats, not doubles.
-    //The new pDir is wrong, and other things might be as well.
-    //I wonder if it's maybe because something's getting converted into ints and then back to
-    //floats.
-    //I think the issue is that floats don't have enough precision for the circle intersection
-    //method. One circle can be incredibly tiny and the other very large, so the result isn't
-    //accurate without more decimal places. Lets give up on the non-trig approach and
-    //see if trig solutions will work.
-    public class Game7 : Game
+    //Still no trig :)
+    //This works by finding the slope of the wall, rotating it 90 degrees (-1/slope)
+    //and adding it to the un-reflected point. This gives 2 ends of a line. The
+    //intersection between that line and the wall is found. Then the un-reflected
+    //point and the intersection are used to find the reflected point.
+    //Corners of walls aren't handles very well, if the reflected point ends up behind
+    //a different wall. Game 9 should try to deal with that.
+
+    public class Game8 : Game
     {
         readonly GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -26,7 +25,7 @@ namespace MonoTest
         Vector2 pDir;
         List<Line> walls;
 
-        public Game7()
+        public Game8()
         {
             graphics = new GraphicsDeviceManager(this);
         }
@@ -38,12 +37,12 @@ namespace MonoTest
             graphics.PreferredBackBufferHeight = screenSize;
             graphics.ApplyChanges();
 
-            p = new Vector2(203, 50);
-            pDir = new Vector2(-5, 5);
+            p = new Vector2(40, 50);
+            pDir = new Vector2(5.3f, 5.3f);
 
             walls = new List<Line>();
-            walls.Add(new Line(new Vector2(50,0), new Vector2(50, screenSize)));
-            walls.Add(new Line(new Vector2(screenSize - 50, 0), new Vector2(screenSize - 50, screenSize)));
+            walls.Add(new Line(new Vector2(40,0), new Vector2(40, screenSize)));
+            walls.Add(new Line(new Vector2(screenSize - 40, 0), new Vector2(screenSize - 40, screenSize)));
             walls.Add(new Line(new Vector2(0, 50), new Vector2(screenSize, 50)));
             walls.Add(new Line(new Vector2(0, screenSize - 50), new Vector2(screenSize, screenSize-50)));
 
@@ -74,7 +73,7 @@ namespace MonoTest
 
                 if (intersection != null)
                 {
-                    var reflPos = Helpers.FindReflCircPoint(wall, intersection.Value, newPos);
+                    var reflPos = Helpers.ReflectPoint(wall, newPos);
                     pDir = Helpers.FindPointAlongRay(intersection.Value,
                         reflPos,
                         pDir.Length());
@@ -100,6 +99,7 @@ namespace MonoTest
             {
                 spriteBatch.DrawLine(wall, Color.Brown);
             }
+            spriteBatch.DrawCircle(p, 20, 20, Color.Red);
             spriteBatch.Draw(canvas, new Vector2(0, 0), Color.White);
             spriteBatch.End();
         }
