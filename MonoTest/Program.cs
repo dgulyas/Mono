@@ -4,7 +4,7 @@
     {
         private static void Main(string[] args)
         {
-            var game = new Game9();
+            var game = new Game10();
             game.Run();
         }
 

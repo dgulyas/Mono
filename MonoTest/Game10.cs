@@ -1,33 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MonoTest
 {
-    //Still no trig :)
-    //This works by finding the slope of the wall, rotating it 90 degrees (-1/slope)
-    //and adding it to the un-reflected point. This gives 2 ends of a line. The
-    //intersection between that line and the wall is found. Then the un-reflected
-    //point and the intersection are used to find the reflected point.
-    //Corners of walls aren't handled very well, if the reflected point ends up behind
-    //a different wall.
-
-    public class Game9 : Game
+    public class Game10 : Game
     {
         readonly GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D canvas;
 
         int screenSize = 1200;
-
-        List<Vector2> Points;
-        List<Vector2> pDirs;
-        List<Color> Rainbow = new List<Color> { 
-            Color.Red, Color.Orange, Color.Yellow, 
-            Color.Green, Color.Blue, Color.Indigo};
         List<Line> walls;
-
-        public Game9()
+        List<Particle> Particles;
+        List<Color> Rainbow = new List<Color> {
+            Color.Red, Color.Orange, Color.Yellow,
+            Color.Green, Color.Blue, Color.Indigo};
+        
+        public Game10()
         {
             graphics = new GraphicsDeviceManager(this);
         }
@@ -44,13 +35,16 @@ namespace MonoTest
 
         private void SetupPoints()
         {
-            Points = new List<Vector2>();
-            pDirs = new List<Vector2>();
+            Particles = new List<Particle>();
 
-            for(int i = 0; i < Rainbow.Count * 4; i++)
+            for(int i = 0; i < Rainbow.Count * 20; i++)
             {
-                Points.Add(new Vector2(120 + 18 * i, 50)); 
-                pDirs.Add(new Vector2(1, 2.1f));
+                Particles.Add(new Particle()
+                {
+                    Position = new Vector2(121 + 8 * i, 51),
+                    Direction = new Vector2(2.1f, 4.1f),
+                    Color = Rainbow[i % Rainbow.Count]
+                });
             }            
         }
 
@@ -66,7 +60,7 @@ namespace MonoTest
         {
             walls = new List<Line>();
             walls.Add(new Line(new Vector2(40, 0), new Vector2(40, screenSize)));
-            walls.Add(new Line(new Vector2(screenSize - 40, 0), new Vector2(screenSize - 40, screenSize)));
+            walls.Add(new Line(new Vector2(screenSize - 50, 0), new Vector2(screenSize - 50, screenSize)));
             walls.Add(new Line(new Vector2(0, 50), new Vector2(screenSize, 50)));
             walls.Add(new Line(new Vector2(0, screenSize - 50), new Vector2(screenSize, screenSize - 50)));
         }
@@ -87,10 +81,10 @@ namespace MonoTest
 
         protected override void Update(GameTime gameTime)
         {
-            for (int i = 0; i < Points.Count; i++)
+            Parallel.ForEach(Particles, particle =>
             {
-                var p = Points[i];
-                var pDir = pDirs[i];
+                var p = particle.Position;
+                var pDir = particle.Direction;
                 var newPos = p + pDir;
 
                 foreach (var wall in walls)
@@ -99,23 +93,32 @@ namespace MonoTest
 
                     if (intersection != null)
                     {
-                        var reflPos = Helpers.ReflectPoint(wall, newPos);
-                        pDir = Helpers.FindPointAlongRay(intersection.Value,
-                            reflPos,
-                            pDir.Length());
-                        pDir -= intersection.Value;
+                        if (wall.P1.X == wall.P2.X)
+                        {
+                            pDir.X *= -1;
 
-                        newPos = reflPos;
+                            var diff = newPos.X - wall.P1.X;
+                            newPos.X = wall.P1.X - diff;
+                        }
+                        else
+                        {
+                            pDir.Y *= -1;
+
+                            var diff = newPos.Y - wall.P1.Y;
+                            newPos.Y = wall.P1.Y - diff;
+                        }
+
                     }
                 }
 
-                p = newPos;
-                Points[i] = p;
-                pDirs[i] = pDir;
+                particle.Position = newPos;
+                particle.Direction = pDir;                
+            });
 
-                var color = Rainbow[i % 6];
-
-                canvas.SetData(0, new Rectangle((int)p.X, (int)p.Y, 2, 2),
+            foreach(var p in Particles)
+            {
+                var color = p.Color;
+                canvas.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
                     new[] { color, color, color, color }, 0, 4);
             }
         }
@@ -127,18 +130,19 @@ namespace MonoTest
 
             spriteBatch.Begin();
 
-            //foreach(var wall in walls)
+            //foreach (var wall in walls)
             //{
             //    spriteBatch.DrawLine(wall, Color.Brown);
-            //}
-            //foreach(var p in Points)
-            //{
-            //    spriteBatch.DrawCircle(p, 20, 20, Color.Red);
             //}
             spriteBatch.Draw(canvas, new Vector2(0, 0), Color.White);
             spriteBatch.End();
         }
+    }
 
-
+    public class Particle
+    {
+        public Vector2 Position { get; set; }
+        public Vector2 Direction { get; set; }
+        public Color Color { get; set; }
     }
 }

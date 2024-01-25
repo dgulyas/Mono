@@ -17,3 +17,5 @@ Game 7: Bouncing a point off a line with circle intersections. Inaccurate.
 Game 8: Bouncing a point off a line with inverted line slope. Much more accurate.
 
 Game 9: Bounce multiple points off multiple lines.
+
+Game 10: Multi-thread point movement. Still too slow.

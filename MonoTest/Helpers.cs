@@ -102,7 +102,7 @@ namespace MonoTest
             var Ua = ((L2P2.X - L2P1.X) * (L1P1.Y - L2P1.Y) - (L2P2.Y - L2P1.Y) * (L1P1.X - L2P1.X)) / denominator;
             var Ub = ((L1P2.X - L1P1.X) * (L1P1.Y - L2P1.Y) - (L1P2.Y - L1P1.Y) * (L1P1.X - L2P1.X)) / denominator;
 
-            if ((Ua <= 0 || Ua >= 1 || Ub <= 0 || Ub >= 1) && mustCoverIntersection)
+            if ((Ua < 0 || Ua > 1 || Ub < 0 || Ub > 1) && mustCoverIntersection)
             {
                 //Line segments don't cover the intersection point
                 return null;
