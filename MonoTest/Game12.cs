@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 
 namespace MonoTest
 {
-    public class Game10 : Game
+    public class Game12 : Game
     {
         readonly GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D canvas;
+        Queue<Texture2D> canvasQ;
+        Texture2D ReadCanvas;
+        Texture2D WriteCanvas;
+        Color[] bits = new Color[1200 * 1200];
 
         int screenSize = 1200;
         List<Line> walls;
@@ -18,9 +21,10 @@ namespace MonoTest
             Color.Red, Color.Orange, Color.Yellow,
             Color.Green, Color.Blue, Color.Indigo};
         
-        public Game10()
+        public Game12()
         {
             graphics = new GraphicsDeviceManager(this);
+            
         }
 
         protected override void Initialize()
@@ -28,6 +32,8 @@ namespace MonoTest
             SetupGraphics();
             SetupPoints();
             SetupWalls();
+
+            canvasQ = new Queue<Texture2D>();
 
             IsFixedTimeStep = false;
             base.Initialize();
@@ -37,7 +43,7 @@ namespace MonoTest
         {
             Particles = new List<Particle>();
 
-            for(int i = 0; i < Rainbow.Count * 15; i++)
+            for(int i = 0; i < Rainbow.Count * 20; i++)
             {
                 Particles.Add(new Particle()
                 {
@@ -69,14 +75,15 @@ namespace MonoTest
         {
             base.LoadContent();
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            canvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
+            ReadCanvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
+            WriteCanvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
         }
 
         protected override void UnloadContent()
         {
             base.UnloadContent();
             spriteBatch.Dispose();
-            canvas.Dispose();
+            //canvas.Dispose();
         }
 
         protected override void Update(GameTime gameTime)
@@ -115,12 +122,19 @@ namespace MonoTest
                 particle.Direction = pDir;                
             });
 
-            foreach(var p in Particles)
+            WriteCanvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
+            ReadCanvas.GetData(bits);
+            WriteCanvas.SetData(bits);
+
+            foreach (var p in Particles)
             {
                 var color = p.Color;
-                canvas.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
+                WriteCanvas.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
                     new[] { color, color, color, color }, 0, 4);
             }
+            
+            canvasQ.Enqueue(ReadCanvas);
+            ReadCanvas = WriteCanvas;
         }
 
         protected override void Draw(GameTime gameTime)
@@ -134,7 +148,10 @@ namespace MonoTest
             //{
             //    spriteBatch.DrawLine(wall, Color.Brown);
             //}
-            spriteBatch.Draw(canvas, new Vector2(0, 0), Color.White);
+            if (canvasQ.Count > 0)
+            {
+                spriteBatch.Draw(canvasQ.Dequeue(), Vector2.Zero, Color.White);
+            }
             spriteBatch.End();
         }
     }

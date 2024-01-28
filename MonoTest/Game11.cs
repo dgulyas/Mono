@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 namespace MonoTest
 {
-    public class Game10 : Game
+    public class Game11 : Game
     {
         readonly GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D canvas;
 
         int screenSize = 1200;
         List<Line> walls;
@@ -18,7 +17,7 @@ namespace MonoTest
             Color.Red, Color.Orange, Color.Yellow,
             Color.Green, Color.Blue, Color.Indigo};
         
-        public Game10()
+        public Game11()
         {
             graphics = new GraphicsDeviceManager(this);
         }
@@ -37,14 +36,15 @@ namespace MonoTest
         {
             Particles = new List<Particle>();
 
-            for(int i = 0; i < Rainbow.Count * 15; i++)
+            for(int i = 0; i < Rainbow.Count * 20; i++)
             {
                 Particles.Add(new Particle()
                 {
                     Position = new Vector2(121 + 8 * i, 51),
                     Direction = new Vector2(2.1f, 4.1f),
-                    Color = Rainbow[i % Rainbow.Count]
-                });
+                    Color = Rainbow[i % Rainbow.Count],
+                    Texture = new Texture2D(GraphicsDevice, screenSize, screenSize)
+            });
             }            
         }
 
@@ -69,14 +69,12 @@ namespace MonoTest
         {
             base.LoadContent();
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            canvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
         }
 
         protected override void UnloadContent()
         {
             base.UnloadContent();
             spriteBatch.Dispose();
-            canvas.Dispose();
         }
 
         protected override void Update(GameTime gameTime)
@@ -112,13 +110,18 @@ namespace MonoTest
                 }
 
                 particle.Position = newPos;
-                particle.Direction = pDir;                
+                particle.Direction = pDir;
+
+                //var color = particle.Color;
+                //particle.Texture.SetData(0, 
+                //    new Rectangle((int)particle.Position.X, (int)particle.Position.Y, 2, 2),
+                //    new[] { color, color, color, color }, 0, 4);
             });
 
-            foreach(var p in Particles)
+            foreach (var p in Particles)
             {
                 var color = p.Color;
-                canvas.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
+                p.Texture.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
                     new[] { color, color, color, color }, 0, 4);
             }
         }
@@ -130,12 +133,13 @@ namespace MonoTest
 
             spriteBatch.Begin();
 
-            //foreach (var wall in walls)
-            //{
-            //    spriteBatch.DrawLine(wall, Color.Brown);
-            //}
-            spriteBatch.Draw(canvas, new Vector2(0, 0), Color.White);
+            foreach(var p in Particles)
+            {
+                spriteBatch.Draw(p.Texture, new Vector2(0, 0), Color.White);
+            }
+
             spriteBatch.End();
         }
     }
+
 }

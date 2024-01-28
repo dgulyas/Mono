@@ -1,15 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace MonoTest
 {
-    public class Game10 : Game
+    //This now has 1200 points and runs pretty fast.
+    //Previously when I didn't call GraphicsDevice.Clear() every
+    //frame it wouldn't work. I'm not sure what's different
+    //between now and then. I can start doing more interesting
+    //things now :)
+
+    public class Game13 : Game
     {
         readonly GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Texture2D canvas;
 
         int screenSize = 1200;
         List<Line> walls;
@@ -18,7 +24,7 @@ namespace MonoTest
             Color.Red, Color.Orange, Color.Yellow,
             Color.Green, Color.Blue, Color.Indigo};
         
-        public Game10()
+        public Game13()
         {
             graphics = new GraphicsDeviceManager(this);
         }
@@ -37,14 +43,17 @@ namespace MonoTest
         {
             Particles = new List<Particle>();
 
-            for(int i = 0; i < Rainbow.Count * 15; i++)
+            for(int i = 0; i < Rainbow.Count * 20; i++)
             {
-                Particles.Add(new Particle()
+                for (int j = 0; j < 10; j++)
                 {
-                    Position = new Vector2(121 + 8 * i, 51),
-                    Direction = new Vector2(2.1f, 4.1f),
-                    Color = Rainbow[i % Rainbow.Count]
-                });
+                    Particles.Add(new Particle()
+                    {
+                        Position = new Vector2(121 + 8 * i, 51),
+                        Direction = new Vector2(2.1f, 1.1f + (float)j),
+                        Color = Rainbow[i % Rainbow.Count]
+                    });
+                }
             }            
         }
 
@@ -54,6 +63,8 @@ namespace MonoTest
             graphics.PreferredBackBufferWidth = screenSize;
             graphics.PreferredBackBufferHeight = screenSize;
             graphics.ApplyChanges();
+
+            GraphicsDevice.Clear(Color.Black);
         }
 
         private void SetupWalls()
@@ -69,14 +80,12 @@ namespace MonoTest
         {
             base.LoadContent();
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            canvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
         }
 
         protected override void UnloadContent()
         {
             base.UnloadContent();
             spriteBatch.Dispose();
-            canvas.Dispose();
         }
 
         protected override void Update(GameTime gameTime)
@@ -114,27 +123,19 @@ namespace MonoTest
                 particle.Position = newPos;
                 particle.Direction = pDir;                
             });
-
-            foreach(var p in Particles)
-            {
-                var color = p.Color;
-                canvas.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
-                    new[] { color, color, color, color }, 0, 4);
-            }
         }
 
         protected override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
-            GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Begin();
-
-            //foreach (var wall in walls)
-            //{
-            //    spriteBatch.DrawLine(wall, Color.Brown);
-            //}
-            spriteBatch.Draw(canvas, new Vector2(0, 0), Color.White);
+            foreach(var p in Particles)
+            {
+                spriteBatch.DrawRectangle(
+                    new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
+                    p.Color);
+            }
             spriteBatch.End();
         }
     }
