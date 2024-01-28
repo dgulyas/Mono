@@ -25,3 +25,5 @@ Game 11: Give each particle it's own texture. Still too slow.
 Game 12: Use a queue of textures to that the GPU never renderd what the CPU is using. Still too slow.
 
 Game 13: Don't erase screen and just draw the newest particle locations. Very fast. Woot.
+
+Game 14: Rainbow circle radiating outwards, reflecting off walls.
