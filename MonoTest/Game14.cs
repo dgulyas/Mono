@@ -48,7 +48,7 @@ namespace MonoTest
                 {
                     Position = new Vector2(600, 600),
                     Direction = new Vector2(1.9f * (float)Math.Cos(angle), 1.9f * (float)Math.Sin(angle)),
-                    Color = Rainbow[i / 600]
+                    Color = Helpers.HSL2RGB((double)i/3600, 0.5, 0.5)
                 });
             }
         }
