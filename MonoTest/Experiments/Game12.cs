@@ -1,14 +1,19 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoTest.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MonoTest
+namespace MonoTest.Experiments
 {
-    public class Game11 : Game
+    public class Game12 : Game
     {
         readonly GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Queue<Texture2D> canvasQ;
+        Texture2D ReadCanvas;
+        Texture2D WriteCanvas;
+        Color[] bits = new Color[1200 * 1200];
 
         int screenSize = 1200;
         List<Line> walls;
@@ -16,10 +21,11 @@ namespace MonoTest
         List<Color> Rainbow = new List<Color> {
             Color.Red, Color.Orange, Color.Yellow,
             Color.Green, Color.Blue, Color.Indigo};
-        
-        public Game11()
+
+        public Game12()
         {
             graphics = new GraphicsDeviceManager(this);
+
         }
 
         protected override void Initialize()
@@ -27,6 +33,8 @@ namespace MonoTest
             SetupGraphics();
             SetupPoints();
             SetupWalls();
+
+            canvasQ = new Queue<Texture2D>();
 
             IsFixedTimeStep = false;
             base.Initialize();
@@ -36,16 +44,15 @@ namespace MonoTest
         {
             Particles = new List<Particle>();
 
-            for(int i = 0; i < Rainbow.Count * 20; i++)
+            for (int i = 0; i < Rainbow.Count * 20; i++)
             {
                 Particles.Add(new Particle()
                 {
                     Position = new Vector2(121 + 8 * i, 51),
                     Direction = new Vector2(2.1f, 4.1f),
-                    Color = Rainbow[i % Rainbow.Count],
-                    Texture = new Texture2D(GraphicsDevice, screenSize, screenSize)
-            });
-            }            
+                    Color = Rainbow[i % Rainbow.Count]
+                });
+            }
         }
 
         private void SetupGraphics()
@@ -69,12 +76,15 @@ namespace MonoTest
         {
             base.LoadContent();
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            ReadCanvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
+            WriteCanvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
         }
 
         protected override void UnloadContent()
         {
             base.UnloadContent();
             spriteBatch.Dispose();
+            //canvas.Dispose();
         }
 
         protected override void Update(GameTime gameTime)
@@ -111,19 +121,21 @@ namespace MonoTest
 
                 particle.Position = newPos;
                 particle.Direction = pDir;
-
-                //var color = particle.Color;
-                //particle.Texture.SetData(0, 
-                //    new Rectangle((int)particle.Position.X, (int)particle.Position.Y, 2, 2),
-                //    new[] { color, color, color, color }, 0, 4);
             });
+
+            WriteCanvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
+            ReadCanvas.GetData(bits);
+            WriteCanvas.SetData(bits);
 
             foreach (var p in Particles)
             {
                 var color = p.Color;
-                p.Texture.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
+                WriteCanvas.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
                     new[] { color, color, color, color }, 0, 4);
             }
+
+            canvasQ.Enqueue(ReadCanvas);
+            ReadCanvas = WriteCanvas;
         }
 
         protected override void Draw(GameTime gameTime)
@@ -133,13 +145,15 @@ namespace MonoTest
 
             spriteBatch.Begin();
 
-            foreach(var p in Particles)
+            //foreach (var wall in walls)
+            //{
+            //    spriteBatch.DrawLine(wall, Color.Brown);
+            //}
+            if (canvasQ.Count > 0)
             {
-                spriteBatch.Draw(p.Texture, new Vector2(0, 0), Color.White);
+                spriteBatch.Draw(canvasQ.Dequeue(), Vector2.Zero, Color.White);
             }
-
             spriteBatch.End();
         }
     }
-
 }

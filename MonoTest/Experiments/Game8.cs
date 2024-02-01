@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame;
+using MonoTest.Common;
 using System.Collections.Generic;
 
-namespace MonoTest
+namespace MonoTest.Experiments
 {
     //Still no trig :)
     //This works by finding the slope of the wall, rotating it 90 degrees (-1/slope)
@@ -41,10 +41,10 @@ namespace MonoTest
             pDir = new Vector2(5.3f, 5.3f);
 
             walls = new List<Line>();
-            walls.Add(new Line(new Vector2(40,0), new Vector2(40, screenSize)));
+            walls.Add(new Line(new Vector2(40, 0), new Vector2(40, screenSize)));
             walls.Add(new Line(new Vector2(screenSize - 40, 0), new Vector2(screenSize - 40, screenSize)));
             walls.Add(new Line(new Vector2(0, 50), new Vector2(screenSize, 50)));
-            walls.Add(new Line(new Vector2(0, screenSize - 50), new Vector2(screenSize, screenSize-50)));
+            walls.Add(new Line(new Vector2(0, screenSize - 50), new Vector2(screenSize, screenSize - 50)));
 
             base.Initialize();
         }
@@ -95,7 +95,7 @@ namespace MonoTest
 
             spriteBatch.Begin();
 
-            foreach(var wall in walls)
+            foreach (var wall in walls)
             {
                 spriteBatch.DrawLine(wall, Color.Brown);
             }

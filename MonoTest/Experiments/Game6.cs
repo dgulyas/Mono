@@ -3,9 +3,9 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame;
+using MonoTest.Common;
 
-namespace MonoTest
+namespace MonoTest.Experiments
 {
     public class Game6 : Game
     {

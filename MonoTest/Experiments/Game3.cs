@@ -1,43 +1,36 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using MonoGame;
-using System;
 
-namespace MonoTest
+namespace MonoTest.Experiments
 {
-    public class Game4 : Game
+    public class Game3 : Game
     {
         readonly GraphicsDeviceManager graphics;
 
-        int numThings = 300000;
-        int screenSize = 2000;
+        int[][] sand;
+        int width = 256;
+        int height = 256;
 
-        int[] x;
-        int[] y;
-
-        Random rand = new Random();
-
-
-        public Game4()
+        public Game3()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-
-            x = new int[numThings];
-            y = new int[numThings];
-            for (int i = 0; i < x.Length; i++)
+            sand = new int[height][];
+            for (int j = 0; j < sand.Length; j++)
             {
-                x[i] = screenSize / 2;
-                y[i] = screenSize / 2;
+                sand[j] = new int[width];
+                for (int i = 0; i < sand[j].Length; i++)
+                {
+                    sand[j][i] = i * j % 255;
+                }
             }
         }
 
         protected override void Initialize()
         {
             graphics.IsFullScreen = false;
-            graphics.PreferredBackBufferWidth = screenSize;
-            graphics.PreferredBackBufferHeight = screenSize;
+            graphics.PreferredBackBufferWidth = width * 6 + 50;
+            graphics.PreferredBackBufferHeight = height * 6 + 50;
             graphics.ApplyChanges();
 
             base.Initialize();
@@ -66,34 +59,20 @@ namespace MonoTest
             whiteRectangle.Dispose();
         }
 
-        protected override void Update(GameTime gameTime)
-        {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            for(int i = 0; i < x.Length; i++)
-            {
-                x[i] += rand.Next(-5, 6);
-                y[i] += rand.Next(-4, 5);
-                if (x[i] < 0 || x[i] >= screenSize || y[i] < 0 || y[i] >= screenSize)
-                {
-                    x[i] = screenSize / 2;
-                    y[i] = screenSize / 2;
-                }
-            }
-
-            base.Update(gameTime);
-        }
-
         protected override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
 
-            for (int i = 0; i < x.Length; i++)
+            for (int y = 0; y < sand.Length; y++)
             {
-                spriteBatch.Draw(whiteRectangle, new Rectangle(x[i], y[i], 2, 2), Color.Black);
+                for (int x = 0; x < sand[y].Length; x++)
+                {
+                    var v = sand[y][x];
+
+                    spriteBatch.Draw(whiteRectangle, new Rectangle(x * 6 + 25, y * 6 + 25, 4, 4), new Color(v, v, v));
+                }
             }
 
             spriteBatch.End();

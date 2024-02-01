@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame;
+using MonoTest.Common;
 
-namespace MonoTest
+namespace MonoTest.Experiments
 {
     public class Game5 : Game
     {
@@ -51,7 +51,7 @@ namespace MonoTest
         {
             p = p + v;
 
-            canvas.SetData(0, new Rectangle(p.X, p.Y, 2, 2), 
+            canvas.SetData(0, new Rectangle(p.X, p.Y, 2, 2),
                 new[] { Color.Red, Color.Red, Color.Red, Color.Red }, 0, 4);
             base.Update(gameTime);
         }
@@ -63,7 +63,7 @@ namespace MonoTest
 
             spriteBatch.Begin();
             spriteBatch.DrawLine(new Line(new Vector2(200, 1), new Vector2(1, 200)), Color.Red);
-            spriteBatch.Draw(canvas, new Vector2(0,0), Color.White);
+            spriteBatch.Draw(canvas, new Vector2(0, 0), Color.White);
             spriteBatch.End();
         }
     }

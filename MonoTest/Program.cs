@@ -1,4 +1,6 @@
-﻿namespace MonoTest
+﻿using MonoTest.Experiments;
+
+namespace MonoTest
 {
     internal class Program
     {

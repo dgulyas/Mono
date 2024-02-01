@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame;
-using System;
+using MonoTest.Common;
 
-namespace MonoTest
+namespace MonoTest.Experiments
 {
     public class Game2 : Game
     {
@@ -51,11 +50,11 @@ namespace MonoTest
 
             spriteBatch.Begin();
 
-            for(int i = 0; i < 100; i++)
+            for (int i = 0; i < 100; i++)
             {
-                for(int j = 0; j < 100; j++)
+                for (int j = 0; j < 100; j++)
                 {
-                    spriteBatch.DrawRectangle(new Rectangle(i*6 + 25, j*6 + 25, 4, 4), Color.Red,3);
+                    spriteBatch.DrawRectangle(new Rectangle(i * 6 + 25, j * 6 + 25, 4, 4), Color.Red, 3);
                 }
             }
 

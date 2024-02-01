@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 
-namespace MonoTest
+namespace MonoTest.Common
 {
     public static class Helpers
     {
@@ -14,7 +14,7 @@ namespace MonoTest
         /// <param name="impactPos">The coordinates on the wall where the point hits it</param>
         /// <param name="endPos">The ending coordinates of the point if it didn't bounce off the wall</param>
         /// <returns>The position fo the point if it had bounced off the wall</returns>
-        public  static Vector2 FindReflCircPoint(Line wall, Vector2 impactPos, Vector2 endPos)
+        public static Vector2 FindReflCircPoint(Line wall, Vector2 impactPos, Vector2 endPos)
         {
             //This works by taking the intersection between 2 circles.
             //The circle centered on one end of the wall going through the endPos
@@ -41,14 +41,14 @@ namespace MonoTest
                 // This should be impossible since they share a common point.
                 throw new Exception();
             }
-            else if ((dist == 0) && (rad1 == rad2))
+            else if (dist == 0 && rad1 == rad2)
             {
                 // No solutions, the circles coincide.
                 // This would happen if the impact point is exactly on the end.
                 //Hopefully this never happens.
                 throw new Exception();
             }
-            
+
             float a = (rad1 * rad1 -
                 rad2 * rad2 + dist * dist) / (2 * dist);
             float h = (float)Math.Sqrt(rad1 * rad1 - a * a);
@@ -65,7 +65,7 @@ namespace MonoTest
                 cy2 + h * (impactPos.X - wallP.X) / dist);
 
             //The reflection point will be the one farthest away from the endPos
-            if(Vector2.Distance(endPos, P1) > Vector2.Distance(endPos, P2))
+            if (Vector2.Distance(endPos, P1) > Vector2.Distance(endPos, P2))
             {
                 return P1;
             }
@@ -126,8 +126,8 @@ namespace MonoTest
             //https://math.stackexchange.com/a/2109383
             var distStartEnd = Vector2.Distance(start, end);
 
-            var x = start.X - ((length * (start.X - end.X)) / distStartEnd);
-            var y = start.Y - ((length * (start.Y - end.Y)) / distStartEnd);
+            var x = start.X - length * (start.X - end.X) / distStartEnd;
+            var y = start.Y - length * (start.Y - end.Y) / distStartEnd;
 
             return new Vector2(x, y);
         }
@@ -154,7 +154,7 @@ namespace MonoTest
             r = l;   // default to gray
             g = l;
             b = l;
-            v = (l <= 0.5) ? (l * (1.0 + sl)) : (l + sl - l * sl);
+            v = l <= 0.5 ? l * (1.0 + sl) : l + sl - l * sl;
             if (v > 0)
             {
                 double m;

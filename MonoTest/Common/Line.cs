@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 
-namespace MonoTest
+namespace MonoTest.Common
 {
     //https://thirdpartyninjas.com/blog/2008/10/07/line-segment-intersection/
     //Line segments intersection math
@@ -18,6 +17,5 @@ namespace MonoTest
         }
 
         public Line() { }
-   
     }
 }

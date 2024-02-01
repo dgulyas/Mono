@@ -1,18 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame;
-using System;
+using MonoTest.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MonoTest
+namespace MonoTest.Experiments
 {
-    //This is the first actually interesting things I've made :)
-
-    public class Game14 : Game
+    public class Game10 : Game
     {
         readonly GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Texture2D canvas;
 
         int screenSize = 1200;
         List<Line> walls;
@@ -20,8 +18,8 @@ namespace MonoTest
         List<Color> Rainbow = new List<Color> {
             Color.Red, Color.Orange, Color.Yellow,
             Color.Green, Color.Blue, Color.Indigo};
-        
-        public Game14()
+
+        public Game10()
         {
             graphics = new GraphicsDeviceManager(this);
         }
@@ -40,15 +38,13 @@ namespace MonoTest
         {
             Particles = new List<Particle>();
 
-            for (int i = 0; i < 3600; i++)
+            for (int i = 0; i < Rainbow.Count * 15; i++)
             {
-                var angle = (Math.PI / 1800) * i + .01;
-
                 Particles.Add(new Particle()
                 {
-                    Position = new Vector2(600, 600),
-                    Direction = new Vector2(1.9f * (float)Math.Cos(angle), 1.9f * (float)Math.Sin(angle)),
-                    Color = Helpers.HSL2RGB((double)i/3600, 0.5, 0.5)
+                    Position = new Vector2(121 + 8 * i, 51),
+                    Direction = new Vector2(2.1f, 4.1f),
+                    Color = Rainbow[i % Rainbow.Count]
                 });
             }
         }
@@ -59,14 +55,12 @@ namespace MonoTest
             graphics.PreferredBackBufferWidth = screenSize;
             graphics.PreferredBackBufferHeight = screenSize;
             graphics.ApplyChanges();
-
-            GraphicsDevice.Clear(Color.Black);
         }
 
         private void SetupWalls()
         {
             walls = new List<Line>();
-            walls.Add(new Line(new Vector2(50, 0), new Vector2(50, screenSize)));
+            walls.Add(new Line(new Vector2(40, 0), new Vector2(40, screenSize)));
             walls.Add(new Line(new Vector2(screenSize - 50, 0), new Vector2(screenSize - 50, screenSize)));
             walls.Add(new Line(new Vector2(0, 50), new Vector2(screenSize, 50)));
             walls.Add(new Line(new Vector2(0, screenSize - 50), new Vector2(screenSize, screenSize - 50)));
@@ -76,12 +70,14 @@ namespace MonoTest
         {
             base.LoadContent();
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            canvas = new Texture2D(GraphicsDevice, screenSize, screenSize);
         }
 
         protected override void UnloadContent()
         {
             base.UnloadContent();
             spriteBatch.Dispose();
+            canvas.Dispose();
         }
 
         protected override void Update(GameTime gameTime)
@@ -117,21 +113,29 @@ namespace MonoTest
                 }
 
                 particle.Position = newPos;
-                particle.Direction = pDir;                
+                particle.Direction = pDir;
             });
+
+            foreach (var p in Particles)
+            {
+                var color = p.Color;
+                canvas.SetData(0, new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
+                    new[] { color, color, color, color }, 0, 4);
+            }
         }
 
         protected override void Draw(GameTime gameTime)
         {
             base.Draw(gameTime);
+            GraphicsDevice.Clear(Color.Black);
 
             spriteBatch.Begin();
-            foreach(var p in Particles)
-            {
-                spriteBatch.DrawRectangle(
-                    new Rectangle((int)p.Position.X, (int)p.Position.Y, 2, 2),
-                    p.Color);
-            }
+
+            //foreach (var wall in walls)
+            //{
+            //    spriteBatch.DrawLine(wall, Color.Brown);
+            //}
+            spriteBatch.Draw(canvas, new Vector2(0, 0), Color.White);
             spriteBatch.End();
         }
     }

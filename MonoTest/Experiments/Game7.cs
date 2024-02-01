@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame;
-using System;
+using MonoTest.Common;
 using System.Collections.Generic;
 
-namespace MonoTest
+namespace MonoTest.Experiments
 {
     //There's a bug in the bouncing code. I'm not sure if it's due to everything being floats, not doubles.
     //The new pDir is wrong, and other things might be as well.
@@ -42,10 +41,10 @@ namespace MonoTest
             pDir = new Vector2(-5, 5);
 
             walls = new List<Line>();
-            walls.Add(new Line(new Vector2(50,0), new Vector2(50, screenSize)));
+            walls.Add(new Line(new Vector2(50, 0), new Vector2(50, screenSize)));
             walls.Add(new Line(new Vector2(screenSize - 50, 0), new Vector2(screenSize - 50, screenSize)));
             walls.Add(new Line(new Vector2(0, 50), new Vector2(screenSize, 50)));
-            walls.Add(new Line(new Vector2(0, screenSize - 50), new Vector2(screenSize, screenSize-50)));
+            walls.Add(new Line(new Vector2(0, screenSize - 50), new Vector2(screenSize, screenSize - 50)));
 
             base.Initialize();
         }
@@ -96,7 +95,7 @@ namespace MonoTest
 
             spriteBatch.Begin();
 
-            foreach(var wall in walls)
+            foreach (var wall in walls)
             {
                 spriteBatch.DrawLine(wall, Color.Brown);
             }
