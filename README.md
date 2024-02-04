@@ -27,3 +27,5 @@ Game 12: Use a queue of textures to that the GPU never renderd what the CPU is u
 Game 13: Don't erase screen and just draw the newest particle locations. Very fast. Woot.
 
 Game 14: Rainbow circle radiating outwards, reflecting off walls.
+
+Game 15: Minor changes from 14. Holding spacebar pauses it.

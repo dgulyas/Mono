@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoTest.Common;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace MonoTest.Experiments
 {
     //This is the first actually interesting things I've made :)
 
-    public class Game14 : Game
+    public class Game15 : Game
     {
         readonly GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -18,7 +19,7 @@ namespace MonoTest.Experiments
         List<Line> walls;
         List<Particle> Particles;
 
-        public Game14()
+        public Game15()
         {
             graphics = new GraphicsDeviceManager(this);
         }
@@ -37,17 +38,7 @@ namespace MonoTest.Experiments
         {
             Particles = new List<Particle>();
 
-            for (int i = 0; i < 3600; i++)
-            {
-                var angle = Math.PI / 1800 * i + .01;
-
-                Particles.Add(new Particle()
-                {
-                    Position = new Vector2(600, 600),
-                    Direction = new Vector2(1.9f * (float)Math.Cos(angle), 1.9f * (float)Math.Sin(angle)),
-                    Color = Helpers.HSL2RGB((double)i / 3600, 0.5, 0.5)
-                });
-            }
+            AddMoreParticles();
         }
 
         private void SetupGraphics()
@@ -63,10 +54,10 @@ namespace MonoTest.Experiments
         private void SetupWalls()
         {
             walls = new List<Line>();
-            walls.Add(new Line(new Vector2(50, 0), new Vector2(50, screenSize)));
-            walls.Add(new Line(new Vector2(screenSize - 50, 0), new Vector2(screenSize - 50, screenSize)));
-            walls.Add(new Line(new Vector2(0, 50), new Vector2(screenSize, 50)));
-            walls.Add(new Line(new Vector2(0, screenSize - 50), new Vector2(screenSize, screenSize - 50)));
+            walls.Add(new Line(new Vector2(1, 1), new Vector2(1, screenSize - 1)));
+            walls.Add(new Line(new Vector2(screenSize -1, 1), new Vector2(screenSize - 1, screenSize - 1)));
+            walls.Add(new Line(new Vector2(1, 1), new Vector2(screenSize - 1, 1)));
+            walls.Add(new Line(new Vector2(1, screenSize - 1), new Vector2(screenSize, screenSize - 1)));
         }
 
         protected override void LoadContent()
@@ -83,39 +74,61 @@ namespace MonoTest.Experiments
 
         protected override void Update(GameTime gameTime)
         {
+            var keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyUp(Keys.Space))
+            {
+                UpdateParticlePosition();
+            }
+        }
+
+        private void UpdateParticlePosition()
+        {
             Parallel.ForEach(Particles, particle =>
             {
                 var p = particle.Position;
                 var pDir = particle.Direction;
                 var newPos = p + pDir;
 
-                foreach (var wall in walls)
+                if (newPos.X < 1)
                 {
-                    var intersection = Helpers.FindIntersection(wall, new Line(p, newPos));
+                    newPos.X = 1;
+                    pDir.X *= -1;
+                }
+                else if (newPos.X > screenSize - 1)
+                {
+                    newPos.X = screenSize - 1;
+                    pDir.X *= -1;
+                }
 
-                    if (intersection != null)
-                    {
-                        if (wall.P1.X == wall.P2.X)
-                        {
-                            pDir.X *= -1;
-
-                            var diff = newPos.X - wall.P1.X;
-                            newPos.X = wall.P1.X - diff;
-                        }
-                        else
-                        {
-                            pDir.Y *= -1;
-
-                            var diff = newPos.Y - wall.P1.Y;
-                            newPos.Y = wall.P1.Y - diff;
-                        }
-
-                    }
+                if (newPos.Y < 1)
+                {
+                    newPos.Y = 1;
+                    pDir.Y *= -1;
+                }
+                else if (newPos.Y > screenSize - 1)
+                {
+                    newPos.Y = screenSize - 1;
+                    pDir.Y *= -1;
                 }
 
                 particle.Position = newPos;
                 particle.Direction = pDir;
             });
+        }
+
+        private void AddMoreParticles()
+        {
+            for (int i = 0; i < 2000; i++)
+            {
+                var angle = Math.PI / 1000 * i + .01;
+
+                Particles.Add(new Particle()
+                {
+                    Position = new Vector2(600, 600),
+                    Direction = new Vector2(1.9f * (float)Math.Cos(angle), 1.9f * (float)Math.Sin(angle)),
+                    Color = Helpers.HSL2RGB((double)i / 2000, 0.5, 0.5)
+                });
+            }
         }
 
         protected override void Draw(GameTime gameTime)
