@@ -6,7 +6,7 @@ namespace MonoTest
     {
         private static void Main(string[] args)
         {
-            var game = new Game15();
+            var game = new Base();
             game.Run();
         }
 
