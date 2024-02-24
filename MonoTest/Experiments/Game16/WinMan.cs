@@ -1,27 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using System.Collections.Generic;
 
 namespace HoleGame.WindowMan
 {
     //Window Manager class
+    //Right now it just is a bunch of squares you can drag around,
+    //reordering them so that the one that's clicked on is on top.
     public class WinMan : Game
     {
         private SpriteBatch _spriteBatch;
         private readonly GraphicsDeviceManager _graphics;
         private Texture2D _squareTxt;
-
-        private readonly int screenSize = 1500;
-
+        private Window _draggedWindow;
         private readonly List<Window> _windows = new List<Window>();
 
-        private MouseState _previousMouseState;
-        private Window _draggedWindow;
-
-        Color _color = Color.Orange;
-        private Color[] Colors = new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Purple };
+        private readonly int screenSize = 1500;
+        private Color[] _colors = new Color[] { Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo, Color.Purple };
 
         public WinMan()
         {
@@ -31,11 +27,9 @@ namespace HoleGame.WindowMan
         protected override void Initialize()
         {
             SetupGraphics();
-            var rand = new Random();
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 21; i++)
             {
-                var rPoint = new Vector2(rand.Next(screenSize / 2), rand.Next(screenSize / 2));
-                _windows.Add(new Window { Rectangle = new Rectangle(50 + i * 50, 50 + i * 50, 400, 400), Color = Colors[i % Colors.Length] });
+                _windows.Add(new Window { Rectangle = new Rectangle(50 + i * 50, 50 + i * 50, 400, 400), Color = _colors[i % _colors.Length] });
             }
 
             base.Initialize();
@@ -55,64 +49,51 @@ namespace HoleGame.WindowMan
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            Content.RootDirectory = "Content";
-            //_assets.LoadAssets(Content);
             _squareTxt = new Texture2D(GraphicsDevice, 1, 1);
             _squareTxt.SetData(0, new Rectangle(0, 0, 1, 1), new[] { Color.White }, 0, 1);
         }
 
         protected override void Update(GameTime gameTime)
         {
-            var cl = GetClickLocation();
-            if (cl != null)
+            var ms = Mouse.GetState();
+
+            if(ms.LeftButton == ButtonState.Released)
+            {
+                _draggedWindow = null;
+            }
+            else if(_draggedWindow == null) //mouse button is down, just started dragging
             {
                 var clickedIndex = -1;
                 for (int i = _windows.Count - 1; i >= 0; i--)
                 {
-                    if (_windows[i].Rectangle.Contains(cl.Value))
+                    if (_windows[i].Rectangle.Contains(ms.Position))
                     {
                         clickedIndex = i;
                         break;
                     }
                 }
 
-                if (clickedIndex >= 0)
+                if(clickedIndex >= 0) //clicked on a window
                 {
                     _draggedWindow = _windows[clickedIndex];
-                    _draggedWindow.DragStart = _draggedWindow.Rectangle.Location;
+                    _draggedWindow.MouseOffset = ms.Position - _draggedWindow.Rectangle.Location;
 
 
-                    if (clickedIndex < _windows.Count - 1)
+                    if (clickedIndex < _windows.Count - 1) //window isn't on top
                     {
                         _windows.RemoveAt(clickedIndex);
                         _windows.Add(_draggedWindow);
                     }
                 }
+
             }
-
-
-
+            else //in the middle of dragging
+            {
+                _draggedWindow.Rectangle.Location = ms.Position - _draggedWindow.MouseOffset;
+            }
 
             base.Update(gameTime);
         }
-
-        private Point? GetClickLocation()
-        {
-            Point? clickLocation = null;
-
-            var mouseState = Mouse.GetState();
-            if (_previousMouseState.LeftButton == ButtonState.Released && mouseState.LeftButton == ButtonState.Pressed)
-            {
-                clickLocation = new Point(mouseState.X, mouseState.Y);
-                //mouseState.
-            }
-            _previousMouseState = mouseState;
-            return clickLocation;
-        }
-
-        //This isn't working so well. I want to create a state machine that both tracks dragging
-        //and clicking.
-
 
         protected override void Draw(GameTime gameTime)
         {
