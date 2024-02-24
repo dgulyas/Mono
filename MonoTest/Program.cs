@@ -1,4 +1,5 @@
-﻿using MonoTest.Experiments;
+﻿using HoleGame.WindowMan;
+using MonoTest.Experiments;
 
 namespace MonoTest
 {
@@ -6,7 +7,7 @@ namespace MonoTest
     {
         private static void Main(string[] args)
         {
-            var game = new Base();
+            var game = new WinMan();
             game.Run();
         }
 
